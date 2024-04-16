@@ -164,6 +164,10 @@ func NewExporter(opts kafkaOpts, topicFilter string, topicExclude string, groupF
 	if opts.useSASL {
 		// Convert to lowercase so that SHA512 and SHA256 is still valid
 		opts.saslMechanism = strings.ToLower(opts.saslMechanism)
+		// Set saslPassword via Env variable if is not defined by argument.
+		if opts.saslPassword == "" && os.Getenv("KAFKA_EXPORTER_SASL_PASSWORD") != "" {
+			opts.saslPassword = os.Getenv("KAFKA_EXPORTER_SASL_PASSWORD")
+		}
 		switch opts.saslMechanism {
 		case "scram-sha512":
 			config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient { return &XDGSCRAMClient{HashGeneratorFcn: SHA512} }

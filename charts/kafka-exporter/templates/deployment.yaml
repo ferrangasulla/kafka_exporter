@@ -59,7 +59,6 @@ spec:
             - --sasl.handshake=false
             {{- end }}
             - --sasl.username={{ .Values.kafkaExporter.sasl.username }}
-            - --sasl.password={{ .Values.kafkaExporter.sasl.password }}
             - --sasl.mechanism={{ .Values.kafkaExporter.sasl.mechanism }}
             {{- end }}
             {{- if .Values.kafkaExporter.tls.enabled}}
@@ -78,6 +77,14 @@ spec:
             {{- if .Values.kafkaExporter.log.enableSarama }}
             - --log.enable-sarama
             {{- end }}
+          {{- if .Values.kafkaExporter.sasl.enabled }}
+          env:
+            - name: KAFKA_EXPORTER_SASL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kafka-exporter.fullname" . }}
+                  key: saslPassword
+          {{- end }}
           ports:
             - name: metrics
               containerPort: 9308
